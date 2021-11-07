@@ -4,29 +4,44 @@ import Box from '@mui/material/Box';
 import Toolbar from '@mui/material/Toolbar';
 import Typography from '@mui/material/Typography';
 import Button from '@mui/material/Button';
-import IconButton from '@mui/material/IconButton';
-import MenuIcon from '@mui/icons-material/Menu';
 import { Link } from 'react-router-dom';
+import useAuth from '../../../Hooks/useAuth';
 
 const Header = () => {
+    const { user, logOut } = useAuth();
+    const menu = {
+        color: 'white',
+        textDecoration: 'none'
+    }
     return (
-        <Box sx={{ flexGrow: 1 }}>
+        <Box>
             <AppBar position="static">
-                <Toolbar>
-                    <IconButton
-                        size="large"
-                        edge="start"
-                        color="inherit"
-                        aria-label="menu"
-                        sx={{ mr: 2 }}
-                    >
-                        <MenuIcon />
-                    </IconButton>
-                    <Typography variant="h6" component="div" sx={{ flexGrow: 1 }}>
-                        News
+                <Toolbar sx={{ display: 'flex', justifyContent: 'space-between' }}>
+                    <Typography variant="h6" component="div">
+                        Doctors Portal
                     </Typography>
-                    <Link to='/appointment'><Button color="inherit">Appointment</Button></Link>
-                    <Button color="inherit">Login</Button>
+                    <div>
+                        <Link style={menu} to='/home'><Button sx={{ fontWeight: 600 }} color="inherit">Home</Button></Link>
+                        <Link style={menu} to='/services'><Button sx={{ fontWeight: 600 }} color="inherit">Services</Button></Link>
+                        <Link style={menu} to='/appointment'><Button sx={{ fontWeight: 600 }} color="inherit">Appointment</Button></Link>
+                        <Link style={menu} to='/aboutUs'><Button sx={{ fontWeight: 600 }} color="inherit">About Us</Button></Link>
+                        {user?.email ?
+                            <Link
+                                onClick={logOut}
+                                style={menu}
+                                to='/login'>
+                                <Button sx={{ fontWeight: 600, color: 'red' }} color="inherit">LogOut</Button>
+                            </Link>
+                            :
+                            <Link
+                                style={menu}
+                                to='/login'>
+                                <Button sx={{ fontWeight: 600 }} color="inherit">Login</Button>
+                            </Link>
+                        }
+
+
+                    </div>
                 </Toolbar>
             </AppBar>
         </Box>
