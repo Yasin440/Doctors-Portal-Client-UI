@@ -4,8 +4,10 @@ import TextField from '@mui/material/TextField';
 import Button from '@mui/material/Button';
 import { Link } from 'react-router-dom';
 import Header from '../../Shared/Header/Header';
+import useAuth from '../../../Hooks/useAuth';
 
 const Login = () => {
+    const { logInWithGoogle, logInWithEmailPassword } = useAuth();
     const [loginData, setLoginData] = useState();
     const handleOnBlur = e => {
         const field = e.target.name;
@@ -13,9 +15,9 @@ const Login = () => {
         const newLoginData = { ...loginData };
         newLoginData[field] = value;
         setLoginData(newLoginData);
-        console.log(loginData);
     }
     const handleLoginSubmit = e => {
+        logInWithEmailPassword(loginData.email, loginData.password);
         e.preventDefault();
     }
     return (
@@ -42,8 +44,22 @@ const Login = () => {
                                 onBlur={handleOnBlur}
                                 type="password"
                                 variant="standard" />
-                            <Button sx={{ width: '75%', my: 4 }} type="submit" variant="contained">Login</Button>
-                            <Link style={{ textDecoration: 'none' }} to="/register"><Button variant="text">New User? Please Register</Button></Link>
+                            <Button
+                                sx={{ width: '75%', my: 3, fontWeight: 600 }}
+                                type="submit"
+                                variant="contained">Login</Button>
+                            <Button
+                                onClick={logInWithGoogle}
+                                sx={{ fontWeight: 600 }}
+                                style={{ display: 'block', margin: 'auto', marginBottom: '2rem' }}
+                                variant="outlined" color="primary">
+                                + GOOGLE
+                            </Button>
+                            <Link style={{ textDecoration: 'none' }} to="/register">
+                                <Button
+                                    sx={{ fontWeight: 600 }}
+                                    variant="text">New User? Please Register</Button>
+                            </Link>
                         </form>
                     </Grid>
                     <Grid item xs={12} md={6}>

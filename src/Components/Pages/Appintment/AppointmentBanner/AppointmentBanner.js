@@ -4,7 +4,7 @@ import Calender from '../../../Shared/Calender/Calender';
 
 const AppointmentBanner = ({ date, setDate }) => {
     return (
-        <div>
+        <div style={{ marginTop: '4rem' }}>
             <Container>
                 <Grid container spacing={2}>
                     <Grid item xs={12} md={6}>

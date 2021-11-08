@@ -7,12 +7,17 @@ import CircularProgress from '@mui/material/CircularProgress';
 import { Link } from 'react-router-dom';
 import Alert from '@mui/material/Alert';
 import useAuth from '../../../../Hooks/useAuth';
+import RegisterSuccessModal from './RegisterSuccessModal';
 
 const Register = () => {
     const [loginData, setLoginData] = useState();
     const [error, setError] = useState();
-
     const { registerWithEmailPassword, loading } = useAuth();
+
+    //register success modal
+    const [regSucModalOpen, setRegSucModalOpen] = React.useState(false);
+    const handleSucModalOpen = () => setRegSucModalOpen(true);
+    const handleSucModalClose = () => setRegSucModalOpen(false);
 
     const handleOnBlur = e => {
         const field = e.target.name;
@@ -29,7 +34,7 @@ const Register = () => {
         }
         else {
             registerWithEmailPassword(loginData.email, loginData.password);
-            setError('');
+            handleSucModalOpen();
         }
 
         e.preventDefault();
@@ -72,14 +77,18 @@ const Register = () => {
                             {error &&
                                 <Alert sx={{ width: '75%', mt: 2, mx: 'auto' }} severity="error">Password didn't Match — check it out!</Alert>
                             }
-                            <Button sx={{ width: '75%', my: 4 }} type="submit" variant="contained">Register</Button>
-                            <Link style={{ textDecoration: 'none' }} to="/login"><Button variant="text">Already Registered? Please Login</Button></Link>
+                            <Button sx={{ width: '75%', my: 4, fontWeight: 600 }} type="submit" variant="contained">Register</Button>
+                            <Link style={{ textDecoration: 'none' }} to="/login"><Button sx={{ fontWeight: 600 }} variant="text">Already Registered? Please Login</Button></Link>
                         </form>
                     </Grid>
                     <Grid item xs={12} md={6}>
                         <img width='100%' src="https://i.ibb.co/HPkX8y6/login.png" alt="img" />
                     </Grid>
                 </Grid>
+                <RegisterSuccessModal
+                    regSucModalOpen={regSucModalOpen}
+                    handleSucModalClose={handleSucModalClose}
+                ></RegisterSuccessModal>
             </Container>
         </div>
     );
