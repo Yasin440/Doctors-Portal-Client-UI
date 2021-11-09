@@ -8,11 +8,13 @@ import { Link } from 'react-router-dom';
 import Alert from '@mui/material/Alert';
 import useAuth from '../../../../Hooks/useAuth';
 import RegisterSuccessModal from './RegisterSuccessModal';
+import { useHistory } from 'react-router-dom';
 
 const Register = () => {
     const [loginData, setLoginData] = useState();
-    const [error, setError] = useState();
-    const { registerWithEmailPassword, loading } = useAuth();
+    const [retypePassError, setRetypePassError] = useState();
+    const { registerWithEmailPassword, loading, error } = useAuth();
+    const history = useHistory()
 
     //register success modal
     const [regSucModalOpen, setRegSucModalOpen] = React.useState(false);
@@ -25,16 +27,14 @@ const Register = () => {
         const newLoginData = { ...loginData };
         newLoginData[field] = value;
         setLoginData(newLoginData);
-        console.log(loginData);
     }
     const handleLoginSubmit = e => {
         if (loginData.password !== loginData.password2) {
-            setError(true);
+            setRetypePassError(true);
             return;
         }
         else {
-            registerWithEmailPassword(loginData.email, loginData.password);
-            handleSucModalOpen();
+            registerWithEmailPassword(loginData.email, loginData.password, loginData.name, handleSucModalOpen, history);
         }
 
         e.preventDefault();
@@ -50,6 +50,17 @@ const Register = () => {
                         </Typography>
                         {loading && <CircularProgress sx={{ my: 3 }} />}
                         <form onSubmit={handleLoginSubmit}>
+                            {error &&
+                                <Alert severity="error">{error}</Alert>
+                            }
+                            <TextField
+                                sx={{ width: '75%', mt: 2 }}
+                                required
+                                name="name"
+                                onBlur={handleOnBlur}
+                                type="text"
+                                label="Your Name"
+                                variant="standard" />
                             <TextField
                                 sx={{ width: '75%', mt: 2 }}
                                 required
@@ -74,7 +85,7 @@ const Register = () => {
                                 onBlur={handleOnBlur}
                                 type="password"
                                 variant="standard" />
-                            {error &&
+                            {retypePassError &&
                                 <Alert sx={{ width: '75%', mt: 2, mx: 'auto' }} severity="error">Password didn't Match — check it out!</Alert>
                             }
                             <Button sx={{ width: '75%', my: 4, fontWeight: 600 }} type="submit" variant="contained">Register</Button>

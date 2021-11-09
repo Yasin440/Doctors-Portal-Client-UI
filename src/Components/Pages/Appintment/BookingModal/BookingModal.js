@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 import Backdrop from '@mui/material/Backdrop';
 import Box from '@mui/material/Box';
 import Modal from '@mui/material/Modal';
@@ -8,13 +8,42 @@ import TextField from '@mui/material/TextField';
 import { Button } from '@mui/material';
 import useAuth from '../../../../Hooks/useAuth';
 
-const BookingModal = ({ BookingOpen, handleBookingClose, booking, date }) => {
+const BookingModal = ({ BookingOpen, handleBookingClose, booking, date, setSuccessBookedAppointment }) => {
     const { name, time } = booking;
     const { user } = useAuth();
+    const initialInfo = { patientName: user.displayName, email: user.email, phone: '' };
+    const [bookAppointment, setBookAppointment] = useState(initialInfo);
+    const appointmentInfo = e => {
+        const field = e.target.name;
+        const value = e.target.value;
+        const newInfo = { ...bookAppointment };
+        newInfo[field] = value;
+        // console.log(newInfo);
+        setBookAppointment(newInfo);
+    }
 
     const handleBooking = e => {
-        alert("Submitting From info");
-        handleBookingClose();
+        //collect data
+        const appointment = {
+            ...bookAppointment,
+            time: time,
+            date: date.toDateString(),
+            serviceName: name
+        }
+        fetch('http://localhost:4000/appointments', {
+            method: 'POST',
+            headers: {
+                'content-type': 'application/json'
+            },
+            body: JSON.stringify(appointment)
+        })
+            .then(res => res.json())
+            .then(data => {
+                if (data.insertedId) {
+                    setSuccessBookedAppointment(true);
+                    handleBookingClose();
+                }
+            })
         e.preventDefault();
     }
     const style = {
@@ -47,23 +76,21 @@ const BookingModal = ({ BookingOpen, handleBookingClose, booking, date }) => {
                     </Typography>
                     <form onSubmit={handleBooking}>
                         <TextField
-                            sx={{ width: '100%', m: '1.2rem auto' }}
-                            disabled
-                            placeholder='Time'
-                            id="outlined-size-small"
-                            defaultValue={time}
-                            size="small"
-                        />
-                        <TextField
+                            required
                             sx={{ width: '100%', m: '1.2rem auto' }}
                             id="outlined-size-small"
+                            name="patientName"
+                            onBlur={appointmentInfo}
                             defaultValue={user?.displayName}
                             placeholder="Your Name"
                             size="small"
                         />
                         <TextField
+                            required
                             sx={{ width: '100%', m: '1.2rem auto' }}
                             id="outlined-size-small"
+                            name='email'
+                            onBlur={appointmentInfo}
                             defaultValue={user?.email}
                             placeholder='Email'
                             size="small"
@@ -71,7 +98,8 @@ const BookingModal = ({ BookingOpen, handleBookingClose, booking, date }) => {
                         <TextField
                             sx={{ width: '100%', m: '1.2rem auto' }}
                             id="outlined-size-small"
-                            defaultValue="Mobile Number"
+                            name='phone'
+                            onBlur={appointmentInfo}
                             placeholder="Mobile Number"
                             size="small"
                         />
@@ -80,7 +108,15 @@ const BookingModal = ({ BookingOpen, handleBookingClose, booking, date }) => {
                             disabled
                             id="outlined-size-small"
                             defaultValue={date.toDateString()}
-                            placeholder={date.toDateString()}
+                            placeholder="Date"
+                            size="small"
+                        />
+                        <TextField
+                            sx={{ width: '100%', m: '1.2rem auto' }}
+                            disabled
+                            placeholder='Time'
+                            id="outlined-size-small"
+                            defaultValue={time}
                             size="small"
                         />
                         <Button type="submit" variant="contained">Submit</Button>

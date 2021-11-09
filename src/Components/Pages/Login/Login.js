@@ -5,10 +5,33 @@ import Button from '@mui/material/Button';
 import { Link } from 'react-router-dom';
 import Header from '../../Shared/Header/Header';
 import useAuth from '../../../Hooks/useAuth';
+import { useLocation, useHistory } from "react-router";
 
 const Login = () => {
-    const { logInWithGoogle, logInWithEmailPassword } = useAuth();
+    const { signInWithGoogle, logInWithEmailPassword } = useAuth();
     const [loginData, setLoginData] = useState();
+
+    const location = useLocation();
+    const history = useHistory();
+    const redirect_url = location.state?.from || '/home';
+    //redirect user with emailPassword
+    const handleEmailPass = (email, password) => {
+        logInWithEmailPassword(email, password)
+            .then(() => {
+                history.push(redirect_url);
+            })
+    }
+    //-------------------
+
+    //redirect user with google
+    const handleGoogleLogin = () => {
+        signInWithGoogle()
+            .then(result => {
+                history.push(redirect_url);
+            })
+    }
+    //---------------
+
     const handleOnBlur = e => {
         const field = e.target.name;
         const value = e.target.value;
@@ -17,7 +40,7 @@ const Login = () => {
         setLoginData(newLoginData);
     }
     const handleLoginSubmit = e => {
-        logInWithEmailPassword(loginData.email, loginData.password);
+        handleEmailPass(loginData.email, loginData.password);
         e.preventDefault();
     }
     return (
@@ -49,7 +72,7 @@ const Login = () => {
                                 type="submit"
                                 variant="contained">Login</Button>
                             <Button
-                                onClick={logInWithGoogle}
+                                onClick={handleGoogleLogin}
                                 sx={{ fontWeight: 600 }}
                                 style={{ display: 'block', margin: 'auto', marginBottom: '2rem' }}
                                 variant="outlined" color="primary">

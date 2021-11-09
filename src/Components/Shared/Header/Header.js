@@ -22,22 +22,25 @@ const Header = () => {
                     </Typography>
                     <div>
                         <Link style={menu} to='/home'><Button sx={{ fontWeight: 600 }} color="inherit">Home</Button></Link>
-                        <Link style={menu} to='/services'><Button sx={{ fontWeight: 600 }} color="inherit">Services</Button></Link>
                         <Link style={menu} to='/appointment'><Button sx={{ fontWeight: 600 }} color="inherit">Appointment</Button></Link>
-                        <Link style={menu} to='/aboutUs'><Button sx={{ fontWeight: 600 }} color="inherit">About Us</Button></Link>
                         {user?.email ?
-                            <Link
-                                onClick={logOut}
-                                style={menu}
-                                to='/login'>
-                                <Button sx={{ fontWeight: 600, color: 'red' }} color="inherit">LogOut</Button>
-                            </Link>
+                            <>
+                                <Link style={menu} to='/dashboard'><Button sx={{ fontWeight: 600 }} color="inherit">Dashboard</Button></Link>
+                                <Link
+                                    onClick={logOut}
+                                    style={menu}
+                                    to='/login'>
+                                    <Button sx={{ fontWeight: 600 }} color="inherit">LogOut</Button>
+                                </Link>
+                                <small>as: {user.displayName}</small>
+                            </>
                             :
                             <Link
                                 style={menu}
                                 to='/login'>
                                 <Button sx={{ fontWeight: 600 }} color="inherit">Login</Button>
                             </Link>
+
                         }
 
 
