@@ -15,17 +15,20 @@ import MailIcon from '@mui/icons-material/Mail';
 import MenuIcon from '@mui/icons-material/Menu';
 import Toolbar from '@mui/material/Toolbar';
 import Typography from '@mui/material/Typography';
-import Grid from '@mui/material/Grid';
-import Calender from '../../Shared/Calender/Calender';
-import Appointments from './Appointments/Appointments';
-import { Link } from 'react-router-dom';
+import { Link, useRouteMatch, Route, Switch } from 'react-router-dom';
+import DashboardHome from './DashboardHome/DashboardHome';
+import MakeAdmin from './MakeAdmin/MakeAdmin';
+import AddDoctor from './AddDoctor/AddDoctor';
+import useAuth from '../../../Hooks/useAuth';
+import PrivateAdminRoute from '../../../PrivateRoute/PrivateAdminRoute';
 
 const drawerWidth = 200;
 
 const Dashboard = (props) => {
     const { window } = props;
     const [mobileOpen, setMobileOpen] = React.useState(false);
-    const [date, setDate] = React.useState(new Date());
+    let { path, url } = useRouteMatch();
+    const { admin } = useAuth();
 
     const handleDrawerToggle = () => {
         setMobileOpen(!mobileOpen);
@@ -42,10 +45,14 @@ const Dashboard = (props) => {
         <div>
             <Toolbar />
             <Divider />
-            <Link style={menu} to='/appointment'>Make Admin</Link>
-            <Link style={menu} to='/appointment'>Add Doctor</Link>
             <Link style={menu} to='/appointment'>Appointment</Link>
-            <Link style={menu} to='/appointment'>Dashboard Home</Link>
+            <Link style={menu} to={`${url}`}>Dashboard</Link>
+            {admin &&
+                <Box>
+                    <Link style={menu} to={`${url}/makeAdmin`}>Make Admin</Link>
+                    <Link style={menu} to={`${url}/addDoctor`}>Add Doctor</Link>
+                </Box>
+            }
             <List>
                 {['Inbox', 'Starred', 'Send email', 'Drafts'].map((text, index) => (
                     <ListItem button key={text}>
@@ -123,19 +130,17 @@ const Dashboard = (props) => {
                 sx={{ flexGrow: 1, p: 3, width: { sm: `calc(100% - ${drawerWidth}px)` } }}
             >
                 <Toolbar />
-                <Grid container spacing={2}>
-                    <Grid item xs={12} md={6} >
-                        <Calender
-                            date={date}
-                            setDate={setDate}
-                        ></Calender>
-                    </Grid>
-                    <Grid item xs={12} md={6} >
-                        <Appointments
-                            date={date}
-                        ></Appointments>
-                    </Grid>
-                </Grid>
+                <Switch>
+                    <Route exact path={path}>
+                        <DashboardHome></DashboardHome>
+                    </Route>
+                    <PrivateAdminRoute path={`${path}/makeAdmin`}>
+                        <MakeAdmin></MakeAdmin>
+                    </PrivateAdminRoute>
+                    <PrivateAdminRoute path={`${path}/addDoctor`}>
+                        <AddDoctor></AddDoctor>
+                    </PrivateAdminRoute>
+                </Switch>
 
             </Box>
         </Box>

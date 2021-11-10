@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import initializeFirebase from "../Components/Pages/Login/Firebase/firebase.init";
-import { getAuth, createUserWithEmailAndPassword, signOut, onAuthStateChanged, signInWithEmailAndPassword, GoogleAuthProvider, signInWithPopup, updateProfile } from "firebase/auth";
+import { getAuth, createUserWithEmailAndPassword, signOut, onAuthStateChanged, signInWithEmailAndPassword, GoogleAuthProvider, signInWithPopup, updateProfile, getIdToken } from "firebase/auth";
 
 //initialize firebase app
 initializeFirebase();
@@ -10,6 +10,9 @@ const useFirebase = () => {
     const [user, setUser] = useState({});
     const [error, setError] = useState();
     const [loading, setLoading] = useState(true);
+    const [admin, setAdmin] = useState(false);
+    const [jwtToken, setJwtToken] = useState('');
+
 
     //registerWithEmailPassword
     const registerWithEmailPassword = (email, password, name, handleSucModalOpen, history) => {
@@ -77,6 +80,10 @@ const useFirebase = () => {
 
             if (user) {
                 setUser(user);
+                getIdToken(user)
+                    .then(idToken => {
+                        setJwtToken(idToken);
+                    })
             }
             else {
                 setUser({});
@@ -86,6 +93,15 @@ const useFirebase = () => {
         return () => unSubscribe;
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [])
+
+    //get admin validation in true of false
+    useEffect(() => {
+        fetch(`http://localhost:4000/users/${user.email}`)
+            .then(res => res.json())
+            .then(data => {
+                setAdmin(data.admin);
+            })
+    }, [user.email])
 
     //logOut user
     const logOut = () => {
@@ -113,8 +129,10 @@ const useFirebase = () => {
 
     return {
         user,
+        admin,
         error,
         loading,
+        jwtToken,
         registerWithEmailPassword,
         logInWithEmailPassword,
         signInWithGoogle,
